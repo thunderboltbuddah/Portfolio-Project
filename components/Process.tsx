@@ -55,14 +55,14 @@ export default function Process() {
   <div
     key={item.id}
     className="
+
       border rounded-2xl
-      p-4 sm:p-6 
-      hover:shadow-lg
-      transition-shadow duration-300
-      max-w-full 
-      mx-auto 
-      flex flex-col items-center /* Always center items (model + text) */
-      text-center               /* Ensure text is always centered */
+    p-4 sm:p-6
+    hover:shadow-lg
+    transition-shadow duration-300
+    w-[86%] sm:w-auto     /* 80% width on mobile, auto on desktop */
+    mx-auto 
+    flex flex-col items-center
     "
   >
     {/* Icon / 3D Model Wrapper */}
