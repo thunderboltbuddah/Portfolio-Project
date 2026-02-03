@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply font-normal bg-white;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply leading-[0.85];
+  }
+  button {
+    @apply cursor-pointer;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply max-w-[100em] w-full mx-auto px-[5vw];
+  }
+  .hero-title {
+    @apply text-5xl sm:text-7xl lg:text-[109px] font-medium uppercase  leading-[0.85] overflow-hidden!;
+  }
+  .hero-text {
+    @apply overflow-hidden!;
+  }
+  .section {
+    @apply pt-28 lg:pt-40;
+  }
+  .section-title {
+    @apply font-medium uppercase text-4xl sm:text-5xl lg:text-7xl xl:text-9xl leading-[0.85];
+  }
+  .text-line {
+    @apply text-nowrap overflow-hidden!;
+  }
+  .card-title {
+    @apply font-medium text-2xl uppercase tracking-wide;
+  }
+
+  .outlined-text {
+    -webkit-text-stroke: 2px rgb(29, 28, 28);
+    color: white;
+  }
+  .footer-outlined-text {
+    -webkit-text-stroke: 2px white;
+    color: transparent;
+  }
+}
