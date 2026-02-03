@@ -2,6 +2,7 @@
 import { navItems } from "@/data/data";
 import { useGSAP, gsap, ScrollTrigger } from "@/lib/gsap-util";
 import React from "react";
+import { Home, Briefcase, Mail } from "lucide-react";
 
 export default function Header() {
   useGSAP(() => {
@@ -24,7 +25,6 @@ export default function Header() {
     });
   });
 
-  // Smooth scroll handler - fully typed
   const handleScroll = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
     href: string
@@ -35,45 +35,89 @@ export default function Header() {
 
     if (elem) {
       window.scrollTo({
-        top: elem.offsetTop - 80, // Adjust header offset if needed
+        top: elem.offsetTop - 70, // smaller mobile header offset
         behavior: "smooth",
       });
     }
   };
 
   return (
-    <header className="fixed top-0 left-0 bg-white/40 backdrop-blur-md w-full py-4 z-50 header">
+    <header
+      className="
+        fixed top-0 left-0 w-full z-50 header
+        bg-white/40 backdrop-blur-sm sm:backdrop-blur-md
+        py-2 sm:py-4
+      "
+    >
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <span
-          className="text-2xl sm:text-3xl cursor-pointer"
+          className="cursor-pointer whitespace-nowrap
+          text-lg sm:text-2xl lg:text-3xl"
           onClick={() =>
             window.scrollTo({ top: 0, behavior: "smooth" })
           }
         >
           <span className="font-bold">Aun</span>
-          <span className="font-light"> | Software Engineer</span>
+          <span className="font-light hidden sm:inline">
+            {" "} | Software Engineer
+          </span>
         </span>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-5">
-          <ul className="flex flex-col sm:flex-row sm:items-center sm:gap-5">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <a
-                  href={item.href}
-                  onClick={(e) => handleScroll(e, item.href)}
-                  className="uppercase font-medium hover:opacity-75 transition-opacity cursor-pointer"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <nav className="flex items-center gap-4 sm:gap-5">
+        <ul className="flex items-center gap-3 sm:gap-5">
+  {navItems.map((item) => {
+    const Icon =
+      item.href === "#home"
+        ? Home
+        : item.href === "#projects"
+        ? Briefcase
+        : Mail;
+
+    return (
+      <li key={item.id}>
+        {/* Mobile: Icon button */}
+        <button
+          onClick={(e) => handleScroll(e, item.href)}
+          className="
+            sm:hidden
+            p-2 rounded-lg
+            hover:bg-black/10 transition
+          "
+          aria-label={item.label}
+        >
+          <Icon size={20} />
+        </button>
+
+        {/* Desktop: Text link */}
+        <a
+          href={item.href}
+          onClick={(e) => handleScroll(e, item.href)}
+          className="
+            hidden sm:block
+            uppercase font-medium
+            text-sm sm:text-base
+            hover:opacity-75 transition-opacity
+            cursor-pointer
+          "
+        >
+          {item.label}
+        </a>
+      </li>
+    );
+  })}
+</ul>
+
 
           <button
             onClick={(e) => handleScroll(e, "#contact")}
-            className="bg-neutral-900 text-white uppercase hidden lg:block px-5 py-3 rounded-lg hover:opacity-85 transition-opacity"
+            className="
+              hidden lg:block
+              bg-neutral-900 text-white uppercase
+              px-5 py-3 rounded-lg
+              hover:opacity-85 transition-opacity
+            "
           >
             Contact
           </button>

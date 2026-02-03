@@ -24,7 +24,7 @@ export const workSecItems = [
     title: "Teaching Assistant (TA) Object-Oriented Programming",
     time: "Aug 2023 - Dec 2022",
     text: "Assisted in grading and providing feedback on over 160 assignments and exams, maintaining a grading accuracy rate of 98%.",
-    text2: "Facilitated interactive discussions and clarified complex concepts, leading to a 25% improvement in student comprehension and participation",
+    text2: "Facilitated interactive discussions and clarified complex concepts.",
     text3: "Held weekly office hours, providing one-on-one support to students, resulting in a 30% increase in student satisfaction ratings.",
     text4: "Collaborated with professors to develop supplementary materials, enhancing the overall learning experience for students.",
     img: "/images/work-2.jpg",

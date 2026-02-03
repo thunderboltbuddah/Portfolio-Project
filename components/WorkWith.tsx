@@ -20,7 +20,7 @@ export default function WorkWith() {
                   alt="logo"
                   width={140}
                   height={39}
-                  className="w-32 h-32"
+                  className="w-32 h-32 grayscale opacity-60"
                 />
               </div>
             ))}

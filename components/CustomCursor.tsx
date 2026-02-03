@@ -76,11 +76,13 @@ const onEnter = () => {
     <div
       ref={cursorRef}
       className="
+
+      hidden md:block fixed pointer-events-none z-[9999]
       shadow-[0_10px_40px_rgba(0,0,0,0.15),0_2px_10px_rgba(0,0,0,0.1),inset_0_0_15px_rgba(255,255,255,0.5)]
-        fixed top-0 left-0
+       top-0 left-0
         w-14 h-14
-        pointer-events-none
-        z-9999
+    
+       
         rounded-full
         backdrop-blur-[1px]
         /* THE GLASS PHYSICS */

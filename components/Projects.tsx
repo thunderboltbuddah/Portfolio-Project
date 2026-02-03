@@ -2,7 +2,7 @@
 import { projectItems } from "@/data/data";
 import { useGSAP, gsap, SplitText } from "@/lib/gsap-util";
 import Image from "next/image";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 export default function Projects() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -10,7 +10,6 @@ export default function Projects() {
   const descriptionsRef = useRef<Array<HTMLDivElement | null>>([]);
   const openIndexRef = useRef<number | null>(null);
 
-  // Helper to safely set refs
   const setProjectRef = (el: HTMLDivElement | null, index: number) => {
     projectsRef.current[index] = el;
   };
@@ -19,12 +18,10 @@ export default function Projects() {
     descriptionsRef.current[index] = el;
   };
 
-  // GSAP Animations
   useGSAP(
     () => {
       if (!containerRef.current) return;
 
-      // Split text animation for titles
       const textSplit = SplitText.create(".text", {
         type: "words lines",
         linesClass: "text-line",
@@ -33,7 +30,7 @@ export default function Projects() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: ".project-title",
-          start: "top 60%",
+          start: "top 80%", // Adjusted for better mobile triggering
         },
       });
 
@@ -44,7 +41,6 @@ export default function Projects() {
         stagger: 0.03,
       });
 
-      // Hover animations for each project
       projectsRef.current.forEach((item) => {
         if (!item) return;
 
@@ -56,8 +52,8 @@ export default function Projects() {
 
         const onMove = (e: MouseEvent) => {
           const rect = item.getBoundingClientRect();
-          const x = e.clientX - rect.left - 150;
-          const y = e.clientY - rect.top - 125;
+          const x = e.clientX - rect.left - 120;
+          const y = e.clientY - rect.top - 80;
           xTo(x);
           yTo(y);
         };
@@ -65,45 +61,30 @@ export default function Projects() {
         const onEnter = () => gsap.to(imageWrapper, { autoAlpha: 1, scale: 1, duration: 0.3 });
         const onLeave = () => gsap.to(imageWrapper, { autoAlpha: 0, scale: 0.5, duration: 0.3 });
 
-        item.addEventListener("mousemove", onMove);
-        item.addEventListener("mouseenter", onEnter);
-        item.addEventListener("mouseleave", onLeave);
-
-        // Cleanup
-        return () => {
-          item.removeEventListener("mousemove", onMove);
-          item.removeEventListener("mouseenter", onEnter);
-          item.removeEventListener("mouseleave", onLeave);
-        };
+        // Only attach mouse listeners if NOT on a touch device
+        if (window.matchMedia("(pointer: fine)").matches) {
+          item.addEventListener("mousemove", onMove);
+          item.addEventListener("mouseenter", onEnter);
+          item.addEventListener("mouseleave", onLeave);
+        }
       });
     },
     { scope: containerRef }
   );
 
-  // Toggle collapsible description
   const toggleDescription = (index: number) => {
     const description = descriptionsRef.current[index];
     if (!description) return;
-
     const isOpen = openIndexRef.current === index;
 
     if (isOpen) {
-      gsap.to(description, {
-        height: 0,
-        duration: 0.4,
-        ease: "power2.inOut",
-        onComplete: () => {
-          openIndexRef.current = null;
-        },
-      });
+      gsap.to(description, { height: 0, duration: 0.4, ease: "power2.inOut" });
+      openIndexRef.current = null;
     } else {
-      // Collapse any other open description
       if (openIndexRef.current !== null) {
         const openDesc = descriptionsRef.current[openIndexRef.current];
-        if (openDesc)
-          gsap.to(openDesc, { height: 0, duration: 0.4, ease: "power2.inOut" });
+        if (openDesc) gsap.to(openDesc, { height: 0, duration: 0.4, ease: "power2.inOut" });
       }
-
       const contentHeight = description.scrollHeight;
       gsap.to(description, { height: contentHeight, duration: 0.4, ease: "power2.inOut" });
       openIndexRef.current = index;
@@ -111,49 +92,49 @@ export default function Projects() {
   };
 
   return (
-    <section id="projects" className="section" ref={containerRef}>
-      <div className="container space-y-14 lg:space-y-20">
-        {/* Section Title */}
-        <div className="project-title">
-          <p className="shrink-0 uppercase font-medium text">Recent Projects</p>
-          <h2 className="text-4xl sm:text-5xl lg:text-7xl font-medium max-w-2xl lg:max-w-4xl mt-2 text">
+    <section id="projects" className="section py-10 md:py-20" ref={containerRef}>
+      <div className="container space-y-10 lg:space-y-20">
+        
+        {/* Responsive Section Title */}
+        <div className="project-title px-4 md:px-0">
+          <p className="uppercase text-xs md:text-sm font-bold tracking-widest text-neutral-500 text">Recent Projects</p>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-medium max-w-full lg:max-w-4xl mt-2 text leading-tight">
             Selected works that demonstrate my approach to digital craft
           </h2>
         </div>
 
-        {/* Project List */}
-        <div className="divide-y divide-neutral-300 border-t border-neutral-300 flex-1 max-w-[80%]">
+        {/* Project List: Removed the fixed 80% width on mobile for better space */}
+        <div className="divide-y divide-neutral-300 border-t border-neutral-300 w-full lg:max-w-[85%]">
           {projectItems.map((item, index) => (
             <div
               key={item.id}
               ref={(el) => setProjectRef(el, index)}
-              className="project-item p-8 hover:bg-neutral-50 focus:bg-neutral-50 transition-all hover:pl-12 cursor-pointer relative"
+              className="project-item group px-4 py-6 md:p-8 hover:bg-neutral-50 transition-all cursor-pointer relative"
+              onClick={() => toggleDescription(index)}
             >
-              {/* Project title button */}
-              <button
-                className="text-left p-0 m-0"
-                onClick={() => toggleDescription(index)}
-              >
-                <h3 className="text-4xl uppercase font-medium text">{item.title}</h3>
-              </button>
+              <div className="flex justify-between items-center">
+                {/* Responsive Project Title */}
+                <h3 className="text-xl sm:text-3xl text-blue-300 md:text-4xl uppercase font-medium text group-hover:translate-x-2 transition-transform duration-300">
+                  {item.title}
+                </h3>
+                <span className="text-2xl md:hidden opacity-40">+</span>
+              </div>
 
-              {/* Collapsible description */}
               <div
                 ref={(el) => setDescriptionRef(el, index)}
                 className="overflow-hidden"
                 style={{ height: 0 }}
               >
-                <p className="text-xl sm:text-2xl py-3">{item.description}</p>
+                <p className="text-base sm:text-xl md:text-2xl py-3 text-neutral-700 leading-relaxed">
+                  {item.description}
+                </p>
 
-                {/* Technologies */}
-                <div className="mt-3 flex flex-wrap gap-2">
+                {/* Smaller Tech Badges for Mobile */}
+                <div className="mt-3 flex flex-wrap gap-2 pb-2">
                   {item.technologies?.map((tech) => (
                     <span
                       key={tech}
-                      className="bg-none border-2 border-black px-5 py-3 rounded-lg text-sm font-medium"
-                      style={{
-                        backdropFilter: "blur(6px)",
-                      }}
+                      className="border border-black px-3 py-1.5 md:px-5 md:py-3 rounded-full text-[10px] md:text-sm font-bold uppercase tracking-tighter md:tracking-normal"
                     >
                       {tech}
                     </span>
@@ -161,14 +142,13 @@ export default function Projects() {
                 </div>
               </div>
 
-              {/* Hover image */}
-              <div className="project-img absolute top-0 left-0 pointer-events-none opacity-0 scale-50 z-20 w-60 h-40">
+              {/* Hover Image: Only visible on desktop via CSS */}
+              <div className="project-img hidden md:block absolute top-0 left-0 pointer-events-none opacity-0 scale-50 z-20 w-60 h-40">
                 <Image
                   src={item.img}
                   alt={item.title}
                   fill
-                  className="w-full h-full object-cover"
-                  hidden={openIndexRef.current === index}
+                  className="w-full h-full object-cover rounded-lg shadow-2xl"
                 />
               </div>
             </div>

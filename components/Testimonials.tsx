@@ -88,52 +88,53 @@ export default function Testimonials() {
         </div>
 
         {/* Testimonial Banner */}
-        <div className="border rounded-2xl mt-16 lg:mt-24 overflow-hidden">
+        <div className="border rounded-2xl container mt-16 lg:mt-24 overflow-hidden">
           <div className="divide-y">
             {/* Animated Testimonial */}
-            <div
-              key={currentIndex}
-              ref={testimonialRef}
-              className="grid gap-5 lg:grid-cols-[0.8fr_1fr] lg:items-center p-6"
-            >
-              {/* Image */}
-              <div className="max-w-115 w-full h-80 mx-auto">
-                <Image
-                  src={item.img}
-                  alt={item.name}
-                  width={640}
-                  height={965}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+        <div
+  key={currentIndex}
+  ref={testimonialRef}
+  className="grid gap-5 lg:grid-cols-[0.8fr_1fr] lg:items-center p-4 sm:p-6"
+>
+  {/* Image */}
+  <div className="max-w-115 w-full h-52 sm:h-80 mx-auto">
+    <Image
+      src={item.img}
+      alt={item.name}
+      width={640}
+      height={965}
+      className="grayscale opacity-60 rounded-xl w-full h-full object-cover"
+    />
+  </div>
 
-              {/* Content */}
-              <div className="border-t lg:border-l lg:border-t-0 lg:pl-5">
-                <div className="flex flex-wrap py-5 px-2.5 gap-3 justify-between">
-                  <p className="text-lg uppercase">
-                    <span className="font-medium">Name:</span> {item.name}
-                  </p>
-                  <p className="text-lg uppercase">
-                    <span className="font-medium">Company:</span> {item.company}
-                  </p>
-                  <p className="text-lg uppercase ">
-                    <span className="font-medium">Project:</span> {item.project}
-                    {item.contact && (
-                      <Link
-                        href={item.contact}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium uppercase flex items-center gap-2 "
-                      >
-                        Contact
-                      </Link>
-                    )}
-                  </p>
-                </div>
+  {/* Content */}
+  <div className="border-t lg:border-l lg:border-t-0 lg:pl-4 sm:pl-5">
+    <div className="flex flex-wrap py-3 sm:py-5 px-2.5 gap-3 justify-between">
+      <p className="text-base sm:text-lg uppercase">
+        <span className="font-medium">Name:</span> {item.name}
+      </p>
+      <p className="text-base sm:text-lg uppercase">
+        <span className="font-medium">Company:</span> {item.company}
+      </p>
+      <p className="text-base sm:text-lg uppercase">
+        <span className="font-medium">Project:</span> {item.project}
+        {item.contact && (
+          <Link
+            href={item.contact}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium uppercase flex items-center gap-2 text-sm sm:text-base"
+          >
+            Contact
+          </Link>
+        )}
+      </p>
+    </div>
 
-                <p className="text-xl sm:text-2xl">{item.desc}</p>
-              </div>
-            </div>
+    <p className="text-base sm:text-xl">{item.desc}</p>
+  </div>
+</div>
+
 
             {/* Controls */}
             <div className="flex justify-between items-center px-6 py-4">

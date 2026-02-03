@@ -11,14 +11,16 @@ gsap.registerPlugin(ScrollTrigger);
 // Hook to track window size
 function useWindowSize() {
   const [size, setSize] = useState({ width: 0, height: 0 });
+
   useEffect(() => {
-    function updateSize() {
+    const updateSize = () =>
       setSize({ width: window.innerWidth, height: window.innerHeight });
-    }
-    window.addEventListener("resize", updateSize);
+
     updateSize();
+    window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
   }, []);
+
   return size;
 }
 
@@ -32,11 +34,12 @@ export default function Scroll3DModels() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const leftModelRef = useRef<THREE.Group>(null!);
   const rightModelRef = useRef<THREE.Group>(null!);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
 
   const { width } = useWindowSize();
   const isMobile = width < 768;
 
-  // Adjust model positions and scales for mobile
+  // Responsive values
   const leftStartX = isMobile ? -2 : -5;
   const rightStartX = isMobile ? 2 : 5;
   const leftEndX = isMobile ? 2 : 5;
@@ -46,29 +49,47 @@ export default function Scroll3DModels() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    ScrollTrigger.create({
+    // 🔥 Kill previous trigger ONLY
+    triggerRef.current?.kill();
+
+    triggerRef.current = ScrollTrigger.create({
       trigger: containerRef.current,
       start: "top top",
-      end: "bottom bottom",
+      end: isMobile ? "bottom 70%" : "bottom bottom",
       scrub: true,
+      invalidateOnRefresh: true,
       onUpdate: (self) => {
-        const progress = self.progress; // 0 -> 1
+        const progress = self.progress;
 
-        if (leftModelRef.current)
+        if (leftModelRef.current) {
           leftModelRef.current.position.x =
             leftStartX + (leftEndX - leftStartX) * progress;
+        }
 
-        if (rightModelRef.current)
+        if (rightModelRef.current) {
           rightModelRef.current.position.x =
             rightStartX + (rightEndX - rightStartX) * progress;
+        }
       },
     });
-  }, [leftStartX, leftEndX, rightStartX, rightEndX]);
+
+    // Refresh on layout change
+    ScrollTrigger.refresh();
+
+    return () => {
+      triggerRef.current?.kill();
+      triggerRef.current = null;
+    };
+  }, [isMobile, leftStartX, leftEndX, rightStartX, rightEndX]);
 
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[200vh] flex items-center justify-center"
+      className="
+        relative w-full
+        h-[120vh] sm:h-[160vh] lg:h-[200vh]
+        flex items-center justify-center
+      "
     >
       <Canvas camera={{ position: [0, 0, 10], fov: isMobile ? 40 : 50 }}>
         <ambientLight intensity={0.6} />
