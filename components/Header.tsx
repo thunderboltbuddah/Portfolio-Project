@@ -1,6 +1,7 @@
 "use client";
 import { navItems } from "@/data/data";
 import { useGSAP, gsap, ScrollTrigger } from "@/lib/gsap-util";
+import React from "react";
 
 export default function Header() {
   useGSAP(() => {
@@ -23,15 +24,18 @@ export default function Header() {
     });
   });
 
-  // Smooth scroll handler
-  const handleScroll = (e, href) => {
+  // Smooth scroll handler - fully typed
+  const handleScroll = (
+    e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+    href: string
+  ) => {
     e.preventDefault();
     const targetId = href.replace("#", "");
     const elem = document.getElementById(targetId);
-    
+
     if (elem) {
       window.scrollTo({
-        top: elem.offsetTop - 80, // Adjust this number for your header height
+        top: elem.offsetTop - 80, // Adjust header offset if needed
         behavior: "smooth",
       });
     }
@@ -41,12 +45,17 @@ export default function Header() {
     <header className="fixed top-0 left-0 bg-white/40 backdrop-blur-md w-full py-4 z-50 header">
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <span className="text-2xl sm:text-3xl cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+        <span
+          className="text-2xl sm:text-3xl cursor-pointer"
+          onClick={() =>
+            window.scrollTo({ top: 0, behavior: "smooth" })
+          }
+        >
           <span className="font-bold">Aun</span>
           <span className="font-light"> | Software Engineer</span>
         </span>
 
-        {/* Nav */}
+        {/* Navigation */}
         <nav className="flex items-center gap-5">
           <ul className="flex flex-col sm:flex-row sm:items-center sm:gap-5">
             {navItems.map((item) => (
@@ -61,7 +70,8 @@ export default function Header() {
               </li>
             ))}
           </ul>
-          <button 
+
+          <button
             onClick={(e) => handleScroll(e, "#contact")}
             className="bg-neutral-900 text-white uppercase hidden lg:block px-5 py-3 rounded-lg hover:opacity-85 transition-opacity"
           >
