@@ -48,36 +48,41 @@ export default function Process() {
           {/* Wrapper */}
           <div className="flex items-center gap-5">
             <h2 className="section-title text overflow-hidden">things</h2>
-            <p className="uppercase font-medium text overflow-hidden">
-               I’m actually good at
-            </p>
+            <p className="uppercase font-medium text-sm sm:text-base overflow-hidden">
+  I’m actually good at
+</p>
+
           </div>
         </div>
         {/* Card wrapper */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mt-24 lg:mt-28">
           {processItems.map((item) => (
 
-            <div key={item.id} className="border p-6 rounded-2xl hover:shadow-lg transition-shadow duration-300  ">
-              {/* Icon */}
-              <div className="h-[250px] w-full relative max-w-max mx-auto group z-10 m-7">
-  {/* The 3D Model replaces the 3 spans */}
+           <div
+  key={item.id}
+  className="
+    border rounded-2xl
+    p-4 sm:p-6      /* smaller padding on mobile */
+    hover:shadow-lg transition-shadow duration-300
+  "
+>
+  {/* Icon / 3D Model */}
+  <div className="h-40 sm:h-[250px] w-full relative max-w-max mx-auto group z-10 m-4 sm:m-7">
     <Rendering resourcePath={`/models/${item.iconName}.glb`} />
 
-    
+    {/* Optional hover glow */}
+    <div className="absolute inset-0 bg-cyan-500/5 blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+  </div>
 
-  {/* Optional: Simple CSS glow that reacts to the group hover */}
-  <div className="absolute inset-0 bg-cyan-500/5 blur-[50px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+  {/* Content */}
+  <div className="space-y-1 sm:space-y-2">
+    <div className="flex items-start gap-1.5">
+      <h3 className="card-title text-blue-300 text-base sm:text-lg">{item.title}</h3>
+    </div>
+    <p className="text-sm sm:text-base">{item.text}</p>
+  </div>
 </div>
-              {/* content */}
-              <div className="space-y-2">
-                {/* title */}
-                <div className="flex items-start gap-1.5 ">
-            
-                  <h3 className="card-title  text-blue-300 ">{item.title}</h3>
-                </div>
-                <p >{item.text}</p>
-              </div>
-            </div>
+
           ))}
         </div>
       </div>
