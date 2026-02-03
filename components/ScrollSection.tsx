@@ -20,7 +20,7 @@ function useWindowSize() {
   return size;
 }
 
-function Model({ url, scale, progress }: { url: string; scale: number; progress: number }) {
+function Model({ url, progress }: { url: string; progress: number }) {
   const { scene } = useGLTF(url);
   useEffect(() => {
     scene.traverse((obj) => {
@@ -30,14 +30,13 @@ function Model({ url, scale, progress }: { url: string; scale: number; progress:
           const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
           materials.forEach((mat) => {
             mat.transparent = true;
-            // Constant visibility until 60% scroll, then fade out
             mat.opacity = progress > 0.6 ? 1 - (progress - 0.6) * 2.5 : 1;
           });
         }
       }
     });
   }, [scene, progress]);
-  return <primitive object={scene} scale={scale} />;
+  return <primitive object={scene} />;
 }
 
 export default function Scroll3DModels() {
@@ -49,8 +48,10 @@ export default function Scroll3DModels() {
   const { width } = useWindowSize();
   const isMobile = width < 768;
 
-  // Paths: Start Center -> Side -> Fly Away
-  const modelScale = isMobile ? 0.6 : 1.3;
+  const modelScale = isMobile ? 0.8 : 1.4;
+  const scrollHeight = isMobile ? "180vh" : "300vh";
+  const exitX = isMobile ? 12 : 25;
+  const exitZ = isMobile ? 12 : 30;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,67 +61,58 @@ export default function Scroll3DModels() {
         trigger: containerRef.current,
         start: "top top",
         end: "bottom bottom",
-        scrub: 1.5,
+        scrub: isMobile ? 0.6 : 1.5,
         onUpdate: (self) => {
           const p = self.progress;
           setProgress(p);
 
-          // LEFT MODEL: Start at 0, move to -15
-          if (leftModelRef.current) {
-            // X: Moves from center to far left
-            leftModelRef.current.position.x = gsap.utils.interpolate(0, -20, p);
-            // Z: Swings toward camera for a "pop" effect before diving away
-            leftModelRef.current.position.z = Math.sin(p * Math.PI) * 8 - (p * 20);
-            // Y: Upward/Downward arc
-            leftModelRef.current.position.y = Math.sin(p * Math.PI) * 2;
-            
-            // Rotation: Increases speed as it moves out
-            leftModelRef.current.rotation.y = p * Math.PI * 6;
-            leftModelRef.current.rotation.x = p * Math.PI * 2;
-            
-            // Scale: Shrinks as it flies away
-            leftModelRef.current.scale.setScalar(modelScale * (1 - p * 0.9));
-          }
+          // SAFETY CHECK: If refs aren't ready yet, skip this frame
+          if (!leftModelRef.current || !rightModelRef.current) return;
 
-          // RIGHT MODEL: Start at 0, move to +15
-          if (rightModelRef.current) {
-            // X: Moves from center to far right
-            rightModelRef.current.position.x = gsap.utils.interpolate(0, 20, p);
-            // Z: Mirror the dive
-            rightModelRef.current.position.z = Math.sin(p * Math.PI) * 8 - (p * 20);
-            // Y: Mirror the arc
-            rightModelRef.current.position.y = -Math.sin(p * Math.PI) * 2;
+          // Scale Logic - Stays 1.0 until p > 0.1
+          const scaleMult = p < 0.1 ? 1 : 1 - (p - 0.1) * 1.2;
+          const currentScale = modelScale * Math.max(0, scaleMult);
 
-            rightModelRef.current.rotation.y = -p * Math.PI * 6;
-            rightModelRef.current.rotation.z = p * Math.PI * 2;
+          // LEFT MODEL
+          leftModelRef.current.position.x = gsap.utils.interpolate(0, -exitX, p);
+          leftModelRef.current.position.z = Math.sin(p * Math.PI) * (isMobile ? 5 : 10) - (p * exitZ);
+          leftModelRef.current.position.y = Math.sin(p * Math.PI) * (isMobile ? 1 : 3);
+          leftModelRef.current.rotation.y = p * Math.PI * 6;
+          leftModelRef.current.rotation.x = p * Math.PI * 2;
+          leftModelRef.current.scale.setScalar(currentScale);
 
-            rightModelRef.current.scale.setScalar(modelScale * (1 - p * 0.9));
-          }
+          // RIGHT MODEL
+          rightModelRef.current.position.x = gsap.utils.interpolate(0, exitX, p);
+          rightModelRef.current.position.z = Math.sin(p * Math.PI) * (isMobile ? 5 : 10) - (p * exitZ);
+          rightModelRef.current.position.y = -Math.sin(p * Math.PI) * (isMobile ? 1 : 3);
+          rightModelRef.current.rotation.y = -p * Math.PI * 6;
+          rightModelRef.current.rotation.z = p * Math.PI * 2;
+          rightModelRef.current.scale.setScalar(currentScale);
         },
       });
     }, containerRef);
 
     return () => ctx.revert();
-  }, [isMobile, modelScale]);
+  }, [isMobile, modelScale, exitX, exitZ]);
 
   return (
-    <section ref={containerRef} className="relative w-full h-[300vh]">
+    <section ref={containerRef} style={{ height: scrollHeight }} className="relative w-full">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <Canvas camera={{ position: [0, 0, 15], fov: 45, far: 1000 }}>
+        <Canvas camera={{ position: [0, 0, 18], fov: isMobile ? 50 : 40, far: 1000 }}>
           <ambientLight intensity={1} />
-          <spotLight position={[10, 20, 10]} intensity={2} />
+          <spotLight position={[10, 20, 10]} intensity={2.5} />
           <pointLight position={[-10, -10, -10]} color="#60a5fa" intensity={3} />
 
-          {/* Float provides the "idle" animation while they are centered */}
-          <Float speed={3} rotationIntensity={1} floatIntensity={2}>
-            <group ref={leftModelRef} position={[0, 0, 0]}>
-              <Model url="/models/1.glb" scale={modelScale} progress={progress} />
+          <Float speed={isMobile ? 1.5 : 3} rotationIntensity={0.5} floatIntensity={isMobile ? 1 : 2}>
+            {/* Setting initial scale here to prevent the "jump" on PC */}
+            <group ref={leftModelRef} scale={[modelScale, modelScale, modelScale]}>
+              <Model url="/models/1.glb" progress={progress} />
             </group>
           </Float>
 
-          <Float speed={3} rotationIntensity={1} floatIntensity={2}>
-            <group ref={rightModelRef} position={[0, 0, 0]}>
-              <Model url="/models/2.glb" scale={modelScale} progress={progress} />
+          <Float speed={isMobile ? 1.5 : 3} rotationIntensity={0.5} floatIntensity={isMobile ? 1 : 2}>
+            <group ref={rightModelRef} scale={[modelScale, modelScale, modelScale]}>
+              <Model url="/models/2.glb" progress={progress} />
             </group>
           </Float>
         </Canvas>
