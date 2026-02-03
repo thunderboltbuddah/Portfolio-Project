@@ -47,7 +47,7 @@ const TrackedModel = ({
 
   return (
     <group ref={groupRef}>
-      <primitive object={scene} dispose={null} />
+      <primitive object={scene} dispose={null}  />
     </group>
   );
 };
