@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React from "react";
 import dynamic from "next/dynamic";
 import ShrekModel from "./ShrekEasterEgg";
@@ -49,7 +49,8 @@ export default function Footer() {
             </div>
 
             {/* THE EASTER EGG */}
-            <div className=" lg:block w-[300px] h-[300px] relative">
+          <div className="w-full max-w-[300px] aspect-square relative overflow-hidden">
+
           
                <ShrekModel resourcePath="/models/cat.glb" />
             </div>

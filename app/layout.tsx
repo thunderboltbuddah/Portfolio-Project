@@ -53,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${clashDisplay.className} antialiased`}>
+      <body className={`${clashDisplay.className} antialiased cursor-auto-mobile`}>
            <CustomCursor />
         <Header />
         <main className="min-h-svh bg-white relative z-40 w-full">
