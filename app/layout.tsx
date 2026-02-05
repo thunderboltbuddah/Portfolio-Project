@@ -22,7 +22,7 @@ export const clashDisplay = localFont({
 
 export const metadata: Metadata = {
   title: "Aun Muhammad's Portfolio",
-  description: "Aun Muhammad,
+  description: "Aun Muhammad",
 };
 
 // Root Layout
