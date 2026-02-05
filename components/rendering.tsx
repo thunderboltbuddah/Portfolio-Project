@@ -141,13 +141,7 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
   return (
     <div className="relative w-full h-full">
       {/* Debug overlay */}
-      <div className="absolute top-2 left-2 bg-black/50 text-white text-xs p-2 rounded z-50">
-        <div>X: {targetRotation.x.toFixed(2)}</div>
-        <div>Y: {targetRotation.y.toFixed(2)}</div>
-        <div>Z: {targetRotation.z.toFixed(2)}</div>
-        <div>Drag X: {dragRotationRef.current.x.toFixed(2)}</div>
-        <div>Drag Y: {dragRotationRef.current.y.toFixed(2)}</div>
-      </div>
+     
 
       <Canvas
         shadows
@@ -158,7 +152,7 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
         onPointerOut={() => setIsHovered(false)}
       >
         <Suspense fallback={null}>
-          <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} makeDefault />
+          <OrbitControls enableZoom={false} enablePan={true} enableRotate={true} makeDefault />
 
           <Bounds fit clip observe margin={1.5}>
             <Center>

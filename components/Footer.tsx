@@ -3,6 +3,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { Github, Linkedin, Twitter } from "lucide-react";
 import Link from "next/link";
+import { navItems } from "@/data/data";
 
 // Import the specific Easter Egg version
 const ShrekModel = dynamic(() => import('./ShrekEasterEgg'), { ssr: false });
@@ -20,10 +21,17 @@ export default function Footer() {
           <div className="w-full lg:w-auto">
             <div className="flex gap-10 mb-6 sm:gap-14">
               <div className="grid gap-1">
-                {["home", "work", "contact"].map((label) => (
-                  <a href="#" className="uppercase text-sm hover:underline" key={label}>{label}</a>
-                ))}
-              </div>
+        {navItems.map((item) => (
+          <a
+            key={item.id}            // unique key
+            href={`${item.href}`}     // link points to the id
+            className="uppercase text-sm hover:underline"
+          >
+            {item.label}             {/* display the name */}
+          </a>
+        ))}
+      </div>
+
               <div className="grid gap-1">
                <div className="flex items-center gap-4">
       {/* GitHub */}
