@@ -24,7 +24,6 @@ const TrackedModel = ({
   const groupRef = useRef<THREE.Group>(null);
   const { actions, mixer } = useAnimations(animations, groupRef);
 
-  // Play all GLTF animations
   useEffect(() => {
     if (!actions) return;
     Object.values(actions).forEach((action) => action?.reset().play());
@@ -37,24 +36,11 @@ const TrackedModel = ({
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // Lerp current rotation toward target rotation (smooth & reduced speed)
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(
-        groupRef.current.rotation.x,
-        targetRotation.x,
-        0.1 // smoothing factor, slower motion
-      );
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(
-        groupRef.current.rotation.y,
-        targetRotation.y,
-        0.1
-      );
-      groupRef.current.rotation.z = THREE.MathUtils.lerp(
-        groupRef.current.rotation.z,
-        targetRotation.z,
-        0.1
-      );
+      // Smoothly move toward targetRotation
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotation.x, 0.1);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotation.y, 0.1);
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, targetRotation.z, 0.1);
     } else {
-      // Desktop mouse
       const { x: mouseX, y: mouseY } = state.mouse;
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mouseX * 0.5, 0.1);
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -mouseY * 0.2, 0.1);
@@ -76,29 +62,56 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
   const gltf = useGLTF(resourcePath);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Target rotation state for mobile
+  // Device rotation state
   const [targetRotation, setTargetRotation] = useState({ x: 0, y: 0, z: 0 });
+
+  // Baseline orientation
+  const baselineRef = useRef({ alpha: 0, beta: 0, gamma: 0 });
+  const [baselineSet, setBaselineSet] = useState(false);
+
+  const setBaseline = () => setBaselineSet(true);
 
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
-      const beta = THREE.MathUtils.degToRad(event.beta || 0);   // X-axis
-      const gamma = THREE.MathUtils.degToRad(event.gamma || 0); // Y-axis
-      const alpha = THREE.MathUtils.degToRad(event.alpha || 0); // Z-axis
+      let alpha = event.alpha || 0;
+      let beta = event.beta || 0;
+      let gamma = event.gamma || 0;
 
-      // Clamp values to prevent 360 spins
+      // Set baseline once
+      if (!baselineSet) {
+        baselineRef.current = { alpha, beta, gamma };
+        return;
+      }
+
+      // Subtract baseline to normalize tilt
+      const adjAlpha = alpha - baselineRef.current.alpha;
+      const adjBeta = beta - baselineRef.current.beta;
+      const adjGamma = gamma - baselineRef.current.gamma;
+
+      // Apply rotation multipliers and clamp
       setTargetRotation({
-        x: THREE.MathUtils.clamp(beta * 0.25, -0.5, 0.5),   // reduced speed & limited tilt
-        y: THREE.MathUtils.clamp(gamma * 0.25, -0.5, 0.5),  // reduced speed & limited tilt
-        z: THREE.MathUtils.clamp(alpha * 0.25, -0.3, 0.3),  // optional Z rotation limit
+        x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjBeta) * 0.25, -0.5, 0.5),
+        y: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjGamma) * 0.25, -0.5, 0.5),
+        z: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjAlpha) * 0.25, -0.3, 0.3),
       });
     };
 
     window.addEventListener("deviceorientation", handleOrientation, true);
     return () => window.removeEventListener("deviceorientation", handleOrientation);
-  }, []);
+  }, [baselineSet]);
 
   return (
     <div className="relative w-full h-full">
+      {/* Button to set baseline */}
+      {!baselineSet && (
+        <button
+          onClick={setBaseline}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded z-50"
+        >
+          Align Phone
+        </button>
+      )}
+
       {/* Debug overlay */}
       <div className="absolute top-2 left-2 bg-black/50 text-white text-xs p-2 rounded z-50">
         <div>X: {targetRotation.x.toFixed(2)}</div>
