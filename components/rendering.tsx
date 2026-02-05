@@ -19,11 +19,12 @@ const TrackedModel = ({
   scene: THREE.Group;
   animations: THREE.AnimationClip[];
   isHovered: boolean;
-  targetRotation: { x: number; y: number };
+  targetRotation: { x: number; y: number; z: number };
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const { actions, mixer } = useAnimations(animations, groupRef);
 
+  // Play all GLTF animations
   useEffect(() => {
     if (!actions) return;
     Object.values(actions).forEach((action) => action?.reset().play());
@@ -31,27 +32,29 @@ const TrackedModel = ({
 
   useFrame((state) => {
     if (!groupRef.current) return;
-
     mixer?.update(state.clock.getDelta());
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // Only rotate around Y-axis (horizontal tilt)
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(
-        groupRef.current.rotation.y,
-        targetRotation.y,
-        0.15
-      );
-
-      // Small clamped X tilt
+      // Lerp current rotation toward target rotation (smooth & reduced speed)
       groupRef.current.rotation.x = THREE.MathUtils.lerp(
         groupRef.current.rotation.x,
         targetRotation.x,
+        0.1 // smoothing factor, slower motion
+      );
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(
+        groupRef.current.rotation.y,
+        targetRotation.y,
+        0.1
+      );
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(
+        groupRef.current.rotation.z,
+        targetRotation.z,
         0.1
       );
     } else {
-      // Desktop mouse rotation
+      // Desktop mouse
       const { x: mouseX, y: mouseY } = state.mouse;
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mouseX * 0.5, 0.1);
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -mouseY * 0.2, 0.1);
@@ -73,18 +76,20 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
   const gltf = useGLTF(resourcePath);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Target rotation for mobile gyro
-  const [targetRotation, setTargetRotation] = useState({ x: 0, y: 0 });
+  // Target rotation state for mobile
+  const [targetRotation, setTargetRotation] = useState({ x: 0, y: 0, z: 0 });
 
-  // Device orientation listener
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
-      const betaRad = THREE.MathUtils.degToRad(event.beta || 0);
-      const gammaRad = THREE.MathUtils.degToRad(event.gamma || 0);
+      const beta = THREE.MathUtils.degToRad(event.beta || 0);   // X-axis
+      const gamma = THREE.MathUtils.degToRad(event.gamma || 0); // Y-axis
+      const alpha = THREE.MathUtils.degToRad(event.alpha || 0); // Z-axis
 
+      // Clamp values to prevent 360 spins
       setTargetRotation({
-        x: THREE.MathUtils.clamp(betaRad * 0.5, -0.3, 0.3), // small X tilt
-        y: gammaRad * 3, // Y-axis multiplier for speed
+        x: THREE.MathUtils.clamp(beta * 0.25, -0.5, 0.5),   // reduced speed & limited tilt
+        y: THREE.MathUtils.clamp(gamma * 0.25, -0.5, 0.5),  // reduced speed & limited tilt
+        z: THREE.MathUtils.clamp(alpha * 0.25, -0.3, 0.3),  // optional Z rotation limit
       });
     };
 
@@ -96,8 +101,9 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
     <div className="relative w-full h-full">
       {/* Debug overlay */}
       <div className="absolute top-2 left-2 bg-black/50 text-white text-xs p-2 rounded z-50">
-        <div>Target X: {targetRotation.x.toFixed(2)}</div>
-        <div>Target Y: {targetRotation.y.toFixed(2)}</div>
+        <div>X: {targetRotation.x.toFixed(2)}</div>
+        <div>Y: {targetRotation.y.toFixed(2)}</div>
+        <div>Z: {targetRotation.z.toFixed(2)}</div>
       </div>
 
       <Canvas
