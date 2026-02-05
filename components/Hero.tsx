@@ -38,7 +38,7 @@ export default function Hero() {
         ref={containerRef}
         className="py-21 lg:py-28 relative z-10" // z-10 to be above topography
       >
-        <Gyro/>
+
 
 
         <div className="container flex flex-col">
