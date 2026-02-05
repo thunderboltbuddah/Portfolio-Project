@@ -36,12 +36,11 @@ const TrackedModel = ({
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // Smooth & limited rotation from device
+      // Smoothly move toward targetRotation
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotation.x, 0.08);
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotation.y, 0.08);
       groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, targetRotation.z, 0.08);
     } else {
-      // Desktop mouse
       const { x: mouseX, y: mouseY } = state.mouse;
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mouseX * 0.5, 0.1);
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -mouseY * 0.2, 0.1);
@@ -64,18 +63,30 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const [targetRotation, setTargetRotation] = useState({ x: 0, y: 0, z: 0 });
+  const baselineRef = useRef<{ beta: number; gamma: number; alpha: number } | null>(null);
 
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
-      const beta = event.beta || 0;   // X-axis (tilt front/back)
-      const gamma = event.gamma || 0; // Y-axis (tilt left/right)
-      const alpha = event.alpha || 0; // Z-axis (compass rotation)
+      const beta = event.beta || 0;   // X-axis tilt
+      const gamma = event.gamma || 0; // Y-axis tilt
+      const alpha = event.alpha || 0; // Z-axis rotation
 
-      // Apply smaller multiplier & clamp for smooth, limited motion
+      // Initialize baseline automatically
+      if (!baselineRef.current) {
+        baselineRef.current = { beta, gamma, alpha };
+        return;
+      }
+
+      // Subtract baseline to normalize resting position
+      const adjBeta = beta - baselineRef.current.beta;
+      const adjGamma = gamma - baselineRef.current.gamma;
+      const adjAlpha = alpha - baselineRef.current.alpha;
+
+      // Apply multipliers & clamp to avoid crazy spinning
       setTargetRotation({
-        x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(beta) * 0.15, -0.5, 0.5),
-        y: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(gamma) * 0.15, -0.5, 0.5),
-        z: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(alpha) * 0.1, -0.3, 0.3),
+        x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjBeta) * 0.15, -0.5, 0.5),
+        y: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjGamma) * 0.15, -0.5, 0.5),
+        z: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjAlpha) * 0.1, -0.3, 0.3),
       });
     };
 
