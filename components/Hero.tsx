@@ -1,6 +1,7 @@
 "use client";
 import { useGSAP, SplitText, gsap } from "@/lib/gsap-util";
 import { useRef } from "react";
+import Gyro from "./Gyro";
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -37,6 +38,9 @@ export default function Hero() {
         ref={containerRef}
         className="py-21 lg:py-28 relative z-10" // z-10 to be above topography
       >
+        <Gyro/>
+
+
         <div className="container flex flex-col">
           {/* Wrapper */}
           <div className="wrapper mt-10">

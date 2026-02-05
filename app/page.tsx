@@ -42,6 +42,8 @@ export default function Home() {
           <Hero />
           <ScrollSection />
           <About />
+ 
+
           <Process />
           <WorkWith />
           <Works />
