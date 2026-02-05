@@ -17,15 +17,6 @@
 }
 
 @layer utilities {
-
-  
-  .cursor-auto-mobile {
-    @media (hover: none), (pointer: coarse) {
-      cursor: auto !important;
-    }
-  
-}
-
   .container {
     @apply max-w-[100em] w-full mx-auto px-[5vw];
   }

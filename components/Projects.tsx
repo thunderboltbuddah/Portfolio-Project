@@ -125,6 +125,15 @@ export default function Projects() {
                 className="overflow-hidden"
                 style={{ height: 0 }}
               >
+                <Image
+               
+                className="mt-6 mb-4 w-full h-auto object-cover rounded-lg "
+                width={1920}
+                height={1080}
+                alt="Project Image"
+                src={item.img}>
+
+                </Image>
                 <p className="text-base sm:text-xl md:text-2xl py-3 text-neutral-700 leading-relaxed">
                   {item.description}
                 </p>

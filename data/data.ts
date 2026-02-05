@@ -46,7 +46,7 @@ export const projectItems = [
     title: "EstateFlow",
     description:
       "Built a server-side rendered application using Next.js with React Server Components and Server Actions. Developed a complete property rental platform featuring search functionality, property listings, pagination, and management tools. Implemented secure authentication with NextAuth.js using Google OAuth. Designed the backend with MongoDB and Mongoose, integrating Cloudinary for image storage and Mapbox for maps. Engineered seamless third-party integrations and advanced data workflows, enhancing platform scalability and elevating the user experience in the dynamic property rental market.",
-    img: "/images/project-1.jpg",
+    img: "/images/pro1.png",
     technologies: ["Next.js", "React Server Components", "Server Actions", "NextAuth.js", "MongoDB", "Mongoose", "Cloudinary", "Mapbox"],
   },
   {
@@ -54,7 +54,7 @@ export const projectItems = [
     title: "NUCES FYP Hub",
     description:
       "Architected a full-stack web application using the MERN stack (MongoDB, Express.js, React, Node.js) to manage end-to-end final year project workflows. Implemented milestone tracking, project lifecycle management, and automated report generation to streamline academic project execution. Developed a role-based grading and evaluation system that enables structured performance assessment and real-time feedback. Integrated Git-based version control workflows, allowing students to manage and link project repositories directly within the platform. Built an AI-powered chatbot to provide personalized assistance and instant responses to project-related queries. Implemented automated notifications and deadline reminder services to improve task completion rates and workflow efficiency.",
-    img: "/images/project-2.jpg",
+    img: "/images/proj2.jpeg",
     technologies: ["MongoDB", "Express.js", "React", "Node.js", "Git", "AI Chatbot", "Notifications System"],
   },
   {
@@ -62,7 +62,7 @@ export const projectItems = [
     title: "ResumeShift",
     description:
       "Contributed to the development of a web application for creating personalized resumes with an intuitive interface and flexible customization options. Developed the platform using React and Bootstrap, streamlining the resume creation process for users. Additionally, worked with CSS, jQuery, PHP, WAMP, and MySQL to enhance functionality and ensure efficient handling of user data.",
-    img: "/images/project-2.jpg",
+    img: "/images/resume.png",
     technologies: ["React", "Bootstrap", "CSS", "jQuery", "PHP", "WAMP", "MySQL"],
   },
   {
@@ -70,7 +70,7 @@ export const projectItems = [
     title: "Spotify Clone",
     description:
       "Built a C++ application simulating Spotify-like users, playlists, and song data. Implemented linked lists for dynamic playlist management and hash tables for fast data lookup. Used heaps (priority queues) to rank top-played songs and binary search trees for efficient searching. Focused on optimizing data organization and computational complexity using core data structures and algorithms concepts.",
-    img: "/images/project-2.jpg",
+    img: "/images/spotify.png",
     technologies: ["C++", "Linked Lists", "Hash Tables", "Heaps (Priority Queues)", "Binary Search Trees", "DSA Concepts"],
   },
   {
@@ -86,7 +86,7 @@ export const projectItems = [
     title: "Sort It",
     description:
       "Created a web-based application that provides a visual representation of various sorting algorithms in action. Developed using HTML, Bootstrap, CSS, and jQuery, the project allows users to observe and understand how different sorting techniques work, enhancing comprehension of algorithm behavior and performance.",
-    img: "/images/project-2.jpg",
+    img: "/images/sort.png",
     technologies: ["HTML", "Bootstrap", "CSS", "jQuery", "Sorting Algorithms Visualization"],
   },
 ];
@@ -270,4 +270,28 @@ export const companyLogos = [
     id: 21,
     icon: "/images/l_2 (21).svg",
   }
+];
+
+export const xrProjects = [
+  {
+    id: 0,
+    title: "Education",
+    description:
+      "Immersive XR experiences designed to enhance learning through interaction.",
+    video: "https://www.youtube.com/embed/yERxym4K6tw?si=YKTsh_dZ_K1KDPfS",
+  },
+  {
+    id: 1,
+    title: "Training",
+    description:
+      "Hands-on virtual training environments for real-world skills.",
+    video: "https://www.youtube.com/embed/Pv_fudcAg7A?si=iIj7qIa8TcPvqP3_",
+  },
+  {
+    id: 2,
+    title: "Sales",
+    description:
+      "Interactive XR showcases for product exploration and sales enablement.",
+    video: "https://www.youtube.com/embed/ikSIS_OIP5U?si=c8WXEtPYBw1l8fXF",
+  },
 ];

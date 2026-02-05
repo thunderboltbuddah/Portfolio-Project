@@ -12,7 +12,7 @@ import ReactLenis from "lenis/react";
 import Preloader from "@/components/Preloader";
 import { Scroll } from "lucide-react";
 import ScrollSection from "@/components/ScrollSection";
-
+import XRProjects from "@/components/XRProjects";
 export default function Home() {
   const [loading, setLoading] = useState(true);
 
@@ -46,6 +46,7 @@ export default function Home() {
           <WorkWith />
           <Works />
           <Projects />
+          <XRProjects/>
           <Awards />
           <Testimonials />
         </ReactLenis>
