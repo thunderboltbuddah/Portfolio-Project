@@ -48,7 +48,7 @@ export default function Scroll3DModels() {
   const { width } = useWindowSize();
   const isMobile = width < 768;
 
-  const modelScale = isMobile ? 0.8 : 1.4;
+  const modelScale = isMobile ? 1.1: 1.7;
   const scrollHeight = isMobile ? "180vh" : "300vh";
   const exitX = isMobile ? 12 : 25;
   const exitZ = isMobile ? 12 : 30;
