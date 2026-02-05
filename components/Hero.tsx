@@ -1,7 +1,6 @@
 "use client";
 import { useGSAP, SplitText, gsap } from "@/lib/gsap-util";
 import { useRef } from "react";
-import { TopographyBackground } from "./Back"; // Your updated topography component
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
