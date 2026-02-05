@@ -15,11 +15,13 @@ const TrackedModel = ({
   animations,
   isHovered,
   targetRotation,
+  dragRotation,
 }: {
   scene: THREE.Group;
   animations: THREE.AnimationClip[];
   isHovered: boolean;
   targetRotation: { x: number; y: number; z: number };
+  dragRotation: { x: number; y: number };
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const { actions, mixer } = useAnimations(animations, groupRef);
@@ -36,11 +38,12 @@ const TrackedModel = ({
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // Smoothly move toward targetRotation
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotation.x, 0.08);
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotation.y, 0.08);
+      // Combine gyro rotation + drag rotation
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotation.x + dragRotation.x, 0.08);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotation.y + dragRotation.y, 0.08);
       groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, targetRotation.z, 0.08);
     } else {
+      // Desktop mouse rotation
       const { x: mouseX, y: mouseY } = state.mouse;
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mouseX * 0.5, 0.1);
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -mouseY * 0.2, 0.1);
@@ -65,24 +68,26 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
   const [targetRotation, setTargetRotation] = useState({ x: 0, y: 0, z: 0 });
   const baselineRef = useRef<{ beta: number; gamma: number; alpha: number } | null>(null);
 
+  // Drag rotation state
+  const dragRotationRef = useRef({ x: 0, y: 0 });
+  const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Device orientation
   useEffect(() => {
     const handleOrientation = (event: DeviceOrientationEvent) => {
-      const beta = event.beta || 0;   // X-axis tilt
-      const gamma = event.gamma || 0; // Y-axis tilt
-      const alpha = event.alpha || 0; // Z-axis rotation
+      const beta = event.beta || 0;
+      const gamma = event.gamma || 0;
+      const alpha = event.alpha || 0;
 
-      // Initialize baseline automatically
       if (!baselineRef.current) {
         baselineRef.current = { beta, gamma, alpha };
         return;
       }
 
-      // Subtract baseline to normalize resting position
       const adjBeta = beta - baselineRef.current.beta;
       const adjGamma = gamma - baselineRef.current.gamma;
       const adjAlpha = alpha - baselineRef.current.alpha;
 
-      // Apply multipliers & clamp to avoid crazy spinning
       setTargetRotation({
         x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjBeta) * 0.15, -0.5, 0.5),
         y: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(adjGamma) * 0.15, -0.5, 0.5),
@@ -94,6 +99,45 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
     return () => window.removeEventListener("deviceorientation", handleOrientation);
   }, []);
 
+  // Touch drag handler
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        lastTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1 && lastTouchRef.current) {
+        const dx = e.touches[0].clientX - lastTouchRef.current.x;
+        const dy = e.touches[0].clientY - lastTouchRef.current.y;
+
+        // Sensitivity multiplier
+        const sensitivity = 0.005;
+        dragRotationRef.current = {
+          x: dragRotationRef.current.x + dy * sensitivity,
+          y: dragRotationRef.current.y + dx * sensitivity,
+        };
+
+        lastTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    };
+
+    const handleTouchEnd = () => {
+      lastTouchRef.current = null;
+    };
+
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-full">
       {/* Debug overlay */}
@@ -101,6 +145,8 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
         <div>X: {targetRotation.x.toFixed(2)}</div>
         <div>Y: {targetRotation.y.toFixed(2)}</div>
         <div>Z: {targetRotation.z.toFixed(2)}</div>
+        <div>Drag X: {dragRotationRef.current.x.toFixed(2)}</div>
+        <div>Drag Y: {dragRotationRef.current.y.toFixed(2)}</div>
       </div>
 
       <Canvas
@@ -121,6 +167,7 @@ const Rendering: React.FC<RenderingProps> = ({ resourcePath, canvasProps }) => {
                 animations={gltf.animations}
                 isHovered={isHovered}
                 targetRotation={targetRotation}
+                dragRotation={dragRotationRef.current}
               />
             </Center>
           </Bounds>
